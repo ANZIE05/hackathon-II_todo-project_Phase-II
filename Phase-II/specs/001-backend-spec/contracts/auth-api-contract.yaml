@@ -1,0 +1,143 @@
+# API Contract: Authentication Endpoints for Todo Application
+
+## Base URL
+`/api/auth`
+
+## Register User
+### `POST /register`
+
+#### Description
+Creates a new user account with the provided credentials.
+
+#### Request
+- **Headers**:
+  - `Content-Type: application/json`
+- **Body**:
+  ```json
+  {
+    "email": "user@example.com",
+    "password": "securePassword123"
+  }
+  ```
+
+#### Validation Rules
+- Email must be valid email format
+- Password must be at least 8 characters
+- Email must not already exist in the system
+
+#### Success Response (201 Created)
+```json
+{
+  "success": true,
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id": "123e4567-e89b-12d3-a456-426614174000",
+    "email": "user@example.com"
+  }
+}
+```
+
+#### Error Responses
+- **400 Bad Request** - Validation Error:
+```json
+{
+  "error": "Validation error details",
+  "code": "VALIDATION_ERROR",
+  "timestamp": "2023-12-01T10:30:00Z",
+  "request_id": "req-abc123def456"
+}
+```
+
+- **409 Conflict** - Email Already Exists:
+```json
+{
+  "error": "Email already exists",
+  "code": "CONFLICT_ERROR",
+  "timestamp": "2023-12-01T10:30:00Z",
+  "request_id": "req-abc123def456"
+}
+```
+
+## Login User
+### `POST /login`
+
+#### Description
+Authenticates user credentials and returns a JWT token.
+
+#### Request
+- **Headers**:
+  - `Content-Type: application/json`
+- **Body**:
+  ```json
+  {
+    "email": "user@example.com",
+    "password": "securePassword123"
+  }
+  ```
+
+#### Validation Rules
+- Email must exist in the system
+- Password must match stored password hash
+- Both email and password must be provided
+
+#### Success Response (200 OK)
+```json
+{
+  "success": true,
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id": "123e4567-e89b-12d3-a456-426614174000",
+    "email": "user@example.com"
+  }
+}
+```
+
+#### Error Responses
+- **401 Unauthorized** - Invalid Credentials:
+```json
+{
+  "error": "Invalid credentials",
+  "code": "AUTH_FAILED_ERROR",
+  "timestamp": "2023-12-01T10:30:00Z",
+  "request_id": "req-abc123def456"
+}
+```
+
+- **400 Bad Request** - Validation Error:
+```json
+{
+  "error": "Validation error details",
+  "code": "VALIDATION_ERROR",
+  "timestamp": "2023-12-01T10:30:00Z",
+  "request_id": "req-abc123def456"
+}
+```
+
+## Logout User
+### `POST /logout`
+
+#### Description
+Logs out the current user (optional endpoint for server-side session management).
+
+#### Request
+- **Headers**:
+  - `Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`
+
+#### Success Response (200 OK)
+```json
+{
+  "success": true,
+  "message": "Successfully logged out"
+}
+```
+
+#### Error Responses
+- **401 Unauthorized** - Invalid Token:
+```json
+{
+  "error": "Authentication required",
+  "code": "AUTH_FAILED_ERROR",
+  "timestamp": "2023-12-01T10:30:00Z",
+  "request_id": "req-abc123def456"
+}
+```

@@ -1,0 +1,334 @@
+# API Contract: Task Management Endpoints for Todo Application
+
+## Base URL
+`/api/tasks`
+
+## Create Task
+### `POST /`
+
+#### Description
+Creates a new task for the authenticated user.
+
+#### Request
+- **Headers**:
+  - `Authorization: Bearer {jwt_token}`
+  - `Content-Type: application/json`
+- **Body**:
+  ```json
+  {
+    "title": "Complete project proposal",
+    "description": "Finish the project proposal document and submit for review",
+    "due_date": "2023-12-31T23:59:59Z",
+    "priority": "high",
+    "completed": false
+  }
+  ```
+
+#### Validation Rules
+- Title is required and must be 1-255 characters
+- Due date must be in valid ISO 8601 format if provided
+- Priority must be one of 'low', 'medium', 'high' if provided
+- Completed must be boolean if provided
+
+#### Success Response (201 Created)
+```json
+{
+  "id": "123e4567-e89b-12d3-a456-426614174000",
+  "title": "Complete project proposal",
+  "description": "Finish the project proposal document and submit for review",
+  "due_date": "2023-12-31T23:59:59Z",
+  "priority": "high",
+  "completed": false,
+  "created_at": "2023-12-01T10:30:00Z",
+  "updated_at": "2023-12-01T10:30:00Z",
+  "user_id": "123e4567-e89b-12d3-a456-426614174111"
+}
+```
+
+#### Error Responses
+- **400 Bad Request** - Validation Error:
+```json
+{
+  "error": "Validation error details",
+  "code": "VALIDATION_ERROR",
+  "timestamp": "2023-12-01T10:30:00Z",
+  "request_id": "req-abc123def456",
+  "details": {
+    "errors": [
+      {
+        "field": "title",
+        "message": "Title is required"
+      }
+    ]
+  }
+}
+```
+
+- **401 Unauthorized** - Invalid Token:
+```json
+{
+  "error": "Authentication required",
+  "code": "AUTH_FAILED_ERROR",
+  "timestamp": "2023-12-01T10:30:00Z",
+  "request_id": "req-abc123def456"
+}
+```
+
+## List Tasks
+### `GET /`
+
+#### Description
+Retrieves all tasks for the authenticated user with optional filtering.
+
+#### Request
+- **Headers**:
+  - `Authorization: Bearer {jwt_token}`
+- **Query Parameters** (optional):
+  - `status`: Filter by completion status ('completed', 'pending')
+  - `priority`: Filter by priority ('low', 'medium', 'high')
+  - `sort`: Sort by ('created_at', 'due_date', 'priority') with optional '-' prefix for descending
+  - `limit`: Limit number of results (max 100)
+  - `offset`: Offset for pagination
+
+#### Success Response (200 OK)
+```json
+{
+  "tasks": [
+    {
+      "id": "123e4567-e89b-12d3-a456-426614174000",
+      "title": "Complete project proposal",
+      "description": "Finish the project proposal document and submit for review",
+      "due_date": "2023-12-31T23:59:59Z",
+      "priority": "high",
+      "completed": false,
+      "created_at": "2023-12-01T10:30:00Z",
+      "updated_at": "2023-12-01T10:30:00Z",
+      "user_id": "123e4567-e89b-12d3-a456-426614174111"
+    }
+  ],
+  "total": 1,
+  "page_info": {
+    "limit": 10,
+    "offset": 0,
+    "has_more": false
+  }
+}
+```
+
+#### Error Responses
+- **401 Unauthorized** - Invalid Token:
+```json
+{
+  "error": "Authentication required",
+  "code": "AUTH_FAILED_ERROR",
+  "timestamp": "2023-12-01T10:30:00Z",
+  "request_id": "req-abc123def456"
+}
+```
+
+## Get Single Task
+### `GET /{id}`
+
+#### Description
+Retrieves a specific task for the authenticated user.
+
+#### Request
+- **Headers**:
+  - `Authorization: Bearer {jwt_token}`
+- **Path Parameters**:
+  - `id`: Task ID (UUID format)
+
+#### Success Response (200 OK)
+```json
+{
+  "id": "123e4567-e89b-12d3-a456-426614174000",
+  "title": "Complete project proposal",
+  "description": "Finish the project proposal document and submit for review",
+  "due_date": "2023-12-31T23:59:59Z",
+  "priority": "high",
+  "completed": false,
+  "created_at": "2023-12-01T10:30:00Z",
+  "updated_at": "2023-12-01T10:30:00Z",
+  "user_id": "123e4567-e89b-12d3-a456-426614174111"
+}
+```
+
+#### Error Responses
+- **401 Unauthorized** - Invalid Token:
+```json
+{
+  "error": "Authentication required",
+  "code": "AUTH_FAILED_ERROR",
+  "timestamp": "2023-12-01T10:30:00Z",
+  "request_id": "req-abc123def456"
+}
+```
+
+- **403 Forbidden** - Access Denied:
+```json
+{
+  "error": "Access denied to requested resource",
+  "code": "ACCESS_DENIED_ERROR",
+  "timestamp": "2023-12-01T10:30:00Z",
+  "request_id": "req-abc123def456"
+}
+```
+
+- **404 Not Found** - Task Not Found:
+```json
+{
+  "error": "Requested resource not found",
+  "code": "RESOURCE_NOT_FOUND_ERROR",
+  "timestamp": "2023-12-01T10:30:00Z",
+  "request_id": "req-abc123def456"
+}
+```
+
+## Update Task
+### `PUT /{id}`
+
+#### Description
+Updates an existing task for the authenticated user.
+
+#### Request
+- **Headers**:
+  - `Authorization: Bearer {jwt_token}`
+  - `Content-Type: application/json`
+- **Path Parameters**:
+  - `id`: Task ID (UUID format)
+- **Body** (all fields optional):
+  ```json
+  {
+    "title": "Updated project proposal",
+    "description": "Revised project proposal document",
+    "due_date": "2024-01-15T23:59:59Z",
+    "priority": "medium",
+    "completed": true
+  }
+  ```
+
+#### Validation Rules
+- At least one field must be provided in the update
+- Due date must be in valid ISO 8601 format if provided
+- Priority must be one of 'low', 'medium', 'high' if provided
+- Completed must be boolean if provided
+
+#### Success Response (200 OK)
+```json
+{
+  "id": "123e4567-e89b-12d3-a456-426614174000",
+  "title": "Updated project proposal",
+  "description": "Revised project proposal document",
+  "due_date": "2024-01-15T23:59:59Z",
+  "priority": "medium",
+  "completed": true,
+  "created_at": "2023-12-01T10:30:00Z",
+  "updated_at": "2023-12-02T15:45:00Z",
+  "user_id": "123e4567-e89b-12d3-a456-426614174111"
+}
+```
+
+#### Error Responses
+- **400 Bad Request** - Validation Error:
+```json
+{
+  "error": "Validation error details",
+  "code": "VALIDATION_ERROR",
+  "timestamp": "2023-12-01T10:30:00Z",
+  "request_id": "req-abc123def456"
+}
+```
+
+- **401 Unauthorized** - Invalid Token:
+```json
+{
+  "error": "Authentication required",
+  "code": "AUTH_FAILED_ERROR",
+  "timestamp": "2023-12-01T10:30:00Z",
+  "request_id": "req-abc123def456"
+}
+```
+
+## Complete Task
+### `PATCH /{id}/complete`
+
+#### Description
+Marks a task as completed.
+
+#### Request
+- **Headers**:
+  - `Authorization: Bearer {jwt_token}`
+- **Path Parameters**:
+  - `id`: Task ID (UUID format)
+
+#### Success Response (200 OK)
+```json
+{
+  "id": "123e4567-e89b-12d3-a456-426614174000",
+  "title": "Complete project proposal",
+  "description": "Finish the project proposal document and submit for review",
+  "due_date": "2023-12-31T23:59:59Z",
+  "priority": "high",
+  "completed": true,
+  "created_at": "2023-12-01T10:30:00Z",
+  "updated_at": "2023-12-02T16:00:00Z",
+  "user_id": "123e4567-e89b-12d3-a456-426614174111"
+}
+```
+
+#### Error Responses
+- **401 Unauthorized** - Invalid Token:
+```json
+{
+  "error": "Authentication required",
+  "code": "AUTH_FAILED_ERROR",
+  "timestamp": "2023-12-01T10:30:00Z",
+  "request_id": "req-abc123def456"
+}
+```
+
+## Delete Task
+### `DELETE /{id}`
+
+#### Description
+Deletes a task for the authenticated user.
+
+#### Request
+- **Headers**:
+  - `Authorization: Bearer {jwt_token}`
+- **Path Parameters**:
+  - `id`: Task ID (UUID format)
+
+#### Success Response (204 No Content)
+No response body
+
+#### Error Responses
+- **401 Unauthorized** - Invalid Token:
+```json
+{
+  "error": "Authentication required",
+  "code": "AUTH_FAILED_ERROR",
+  "timestamp": "2023-12-01T10:30:00Z",
+  "request_id": "req-abc123def456"
+}
+```
+
+- **403 Forbidden** - Access Denied:
+```json
+{
+  "error": "Access denied to requested resource",
+  "code": "ACCESS_DENIED_ERROR",
+  "timestamp": "2023-12-01T10:30:00Z",
+  "request_id": "req-abc123def456"
+}
+```
+
+- **404 Not Found** - Task Not Found:
+```json
+{
+  "error": "Requested resource not found",
+  "code": "RESOURCE_NOT_FOUND_ERROR",
+  "timestamp": "2023-12-01T10:30:00Z",
+  "request_id": "req-abc123def456"
+}
+```
