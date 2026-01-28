@@ -1,10 +1,7 @@
-// import { redirect } from 'next/navigation';
+import { redirect } from 'next/navigation';
 
-// export default function Home() {
+export default function DashboardPage() {
 
-// redirect('/dashboard');
+redirect('/dashboard');
   
-// }
-export default function Home() {
-  return null;
 }
