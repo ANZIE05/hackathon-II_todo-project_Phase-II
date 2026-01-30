@@ -1,7 +1,7 @@
 'use client';
 
 import LoginForm from '@/components/auth/LoginForm';
-import { useAuth } from '@/lib/context';
+import { useAuth } from '../../lib/context';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 

@@ -5,8 +5,8 @@ import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import TaskList from '@/components/ui/TaskList';
 import EmptyState from '@/components/ui/EmptyState';
 import { Task } from '@/lib/types';
-import { taskApi } from '@/lib/api';
-import { useAuth } from '@/lib/context';
+import { taskApi } from '../../lib/api';
+import { useAuth } from '../../lib/context';
 
 const DashboardPage = () => {
 

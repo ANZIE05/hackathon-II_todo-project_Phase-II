@@ -83,7 +83,13 @@ const EditTaskPage = () => {
   };
 
   const validateForm = () => {
-    const newErrors: Partial<FormData> = {};
+   
+    type FormErrors = Partial<Record<keyof FormData, string>>;
+    const [errors, setErrors] = useState<FormErrors>({});
+
+    const newErrors: FormErrors = {};
+
+
     Object.entries(formData).forEach(([key, value]) => {
       if (typeof value === 'string') {
         const error = validateField(key as keyof FormData, value);
