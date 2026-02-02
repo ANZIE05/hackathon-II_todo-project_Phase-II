@@ -17,6 +17,57 @@ interface FormData {
 
 type FormErrors = Partial<Record<keyof FormData, string>>;
 
+const validateField = (name: keyof FormData, value: string) => {
+  switch (name) {
+    case 'title':
+      if (!value) {
+        return 'Title is required';
+      }
+      if (value.length > 255) {
+        return 'Title must be less than 255 characters';
+      }
+      return '';
+    case 'description':
+      if (value.length > 1000) {
+        return 'Description must be less than 1000 characters';
+      }
+      return '';
+    default:
+      return '';
+  }
+};
+
+const useValidateForm = () => {
+  const [errors, setErrors] = useState<FormErrors>({});
+
+  const validateForm = (data: FormData) => {
+    const newErrors: FormErrors = {};
+
+    Object.entries(data).forEach(([key, value]) => {
+      if (typeof value === 'string') {
+        const error = validateField(key as keyof FormData, value);
+        if (error) {
+          newErrors[key as keyof FormData] = error;
+        }
+      }
+    });
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const clearFieldError = (name: keyof FormData) => {
+    setErrors(prevErrors => {
+      if (!prevErrors[name]) {
+        return prevErrors;
+      }
+      return { ...prevErrors, [name]: undefined };
+    });
+  };
+
+  return { errors, validateForm, clearFieldError };
+};
+
 const EditTaskPage = () => {
   const router = useRouter();
   const params = useParams();
@@ -29,9 +80,9 @@ const EditTaskPage = () => {
     dueDate: '',
     status: 'active'
   });
-  const [errors, setErrors] = useState<FormErrors>({});
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const { errors, validateForm, clearFieldError } = useValidateForm();
 
   // Load task data on component mount
   useEffect(() => {
@@ -64,56 +115,20 @@ const EditTaskPage = () => {
     }
   }, [taskId]);
 
-  const validateField = (name: keyof FormData, value: string) => {
-    switch (name) {
-      case 'title':
-        if (!value) {
-          return 'Title is required';
-        }
-        if (value.length > 255) {
-          return 'Title must be less than 255 characters';
-        }
-        return '';
-      case 'description':
-        if (value.length > 1000) {
-          return 'Description must be less than 1000 characters';
-        }
-        return '';
-      default:
-        return '';
-    }
-  };
-
-  const validateForm = () => {
-    const newErrors: FormErrors = {};
-
-    Object.entries(formData).forEach(([key, value]) => {
-      if (typeof value === 'string') {
-        const error = validateField(key as keyof FormData, value);
-        if (error) {
-          newErrors[key as keyof FormData] = error;
-        }
-      }
-    });
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
 
     // Clear the error for this field when user starts typing
     if (errors[name as keyof FormData]) {
-      setErrors(prev => ({ ...prev, [name]: undefined }));
+      clearFieldError(name as keyof FormData);
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!validateForm()) {
+    if (!validateForm(formData)) {
       return;
     }
 
