@@ -1,4 +1,6 @@
-import { useState, useEffect } from 'react';
+'use client';
+
+import { useState } from 'react';
 import { Task } from '@/lib/types';
 import { taskApi } from '@/lib/api';
 

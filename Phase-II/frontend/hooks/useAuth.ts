@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useEffect } from 'react';
 import { User } from '@/lib/types';
 import { getUserFromToken, hasToken, removeToken } from '@/lib/auth';
