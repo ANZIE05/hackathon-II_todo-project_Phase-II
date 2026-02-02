@@ -13,6 +13,8 @@ interface FormData {
   dueDate: string;
 }
 
+type FormErrors = Partial<Record<keyof FormData, string>>;
+
 const NewTaskPage = () => {
   const router = useRouter();
   const { createTask } = useTasks();
@@ -22,7 +24,7 @@ const NewTaskPage = () => {
     priority: 'medium',
     dueDate: ''
   });
-  const [errors, setErrors] = useState<Partial<FormData>>({});
+  const [errors, setErrors] = useState<FormErrors>({});
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -47,7 +49,7 @@ const NewTaskPage = () => {
   };
 
   const validateForm = () => {
-    const newErrors: Partial<FormData> = {};
+    const newErrors: FormErrors = {};
     Object.entries(formData).forEach(([key, value]) => {
       if (typeof value === 'string') {
         const error = validateField(key as keyof FormData, value);
