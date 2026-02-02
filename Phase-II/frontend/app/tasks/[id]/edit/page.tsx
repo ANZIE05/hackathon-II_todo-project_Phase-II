@@ -15,6 +15,8 @@ interface FormData {
   status: 'active' | 'completed';
 }
 
+type FormErrors = Partial<Record<keyof FormData, string>>;
+
 const EditTaskPage = () => {
   const router = useRouter();
   const params = useParams();
@@ -27,7 +29,7 @@ const EditTaskPage = () => {
     dueDate: '',
     status: 'active'
   });
-  const [errors, setErrors] = useState<Partial<FormData>>({});
+  const [errors, setErrors] = useState<FormErrors>({});
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -83,12 +85,7 @@ const EditTaskPage = () => {
   };
 
   const validateForm = () => {
-   
-    type FormErrors = Partial<Record<keyof FormData, string>>;
-    const [errors, setErrors] = useState<FormErrors>({});
-
     const newErrors: FormErrors = {};
-
 
     Object.entries(formData).forEach(([key, value]) => {
       if (typeof value === 'string') {
