@@ -3,8 +3,7 @@
 import React, { useState } from 'react';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import { useRouter } from 'next/navigation';
-import { taskApi } from '@/lib/api';
-import { useTasks } from '@/hooks/useTasks';
+import useTasks from '@/hooks/useTasks';
 import Button from '@/components/ui/Button';
 
 interface FormData {
