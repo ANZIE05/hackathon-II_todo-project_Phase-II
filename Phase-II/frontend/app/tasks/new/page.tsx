@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import { useRouter } from 'next/navigation';
 import { taskApi } from '@/lib/api';
-import { useTasks } from '@/hooks/useTasks';
+import useTasks from '@/hooks/useTasks';
 import Button from '@/components/ui/Button';
 
 interface FormData {
@@ -12,6 +12,13 @@ interface FormData {
   description: string;
   priority: 'low' | 'medium' | 'high';
   dueDate: string;
+}
+
+interface FormErrors {
+  title?: string;
+  description?: string;
+  priority?: string;
+  dueDate?: string;
 }
 
 const NewTaskPage = () => {
@@ -23,7 +30,8 @@ const NewTaskPage = () => {
     priority: 'medium',
     dueDate: ''
   });
-  const [errors, setErrors] = useState<Partial<FormData>>({});
+
+  const [errors, setErrors] = useState<FormErrors>({});
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -48,12 +56,12 @@ const NewTaskPage = () => {
   };
 
   const validateForm = () => {
-    const newErrors: Partial<FormData> = {};
+    const newErrors: FormErrors = {};
     Object.entries(formData).forEach(([key, value]) => {
       if (typeof value === 'string') {
         const error = validateField(key as keyof FormData, value);
         if (error) {
-          newErrors[key as keyof FormData] = error;
+          newErrors[key as keyof FormErrors] = error;
         }
       }
     });
