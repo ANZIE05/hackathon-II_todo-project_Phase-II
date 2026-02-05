@@ -30,7 +30,6 @@ const NewTaskPage = () => {
     priority: 'medium',
     dueDate: ''
   });
-
   const [errors, setErrors] = useState<FormErrors>({});
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);

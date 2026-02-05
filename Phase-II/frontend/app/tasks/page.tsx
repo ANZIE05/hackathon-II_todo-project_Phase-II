@@ -6,7 +6,6 @@ import TaskList from '@/components/ui/TaskList';
 import EmptyState from '@/components/ui/EmptyState';
 import TaskFilters from '@/components/task/TaskFilters';
 import { Task } from '@/lib/types';
-import { taskApi } from '@/lib/api';
 import useTasks from '@/hooks/useTasks';
 import { useAuth } from '@/lib/context';
 
