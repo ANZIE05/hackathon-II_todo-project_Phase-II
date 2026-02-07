@@ -1,4 +1,6 @@
-import React from 'react';
+'use client';
+
+import React, { useState } from 'react';
 import { Task } from '@/lib/types';
 import Button from '@/components/ui/Button';
 
@@ -16,6 +18,7 @@ interface FormData {
   dueDate: string;
   status: 'active' | 'completed';
 }
+type FormErrors = Partial<Record<keyof FormData, string>>;
 
 const TaskForm: React.FC<TaskFormProps> = ({ task, onSubmit, onCancel, loading = false }) => {
   const [formData, setFormData] = React.useState<FormData>({
@@ -25,7 +28,9 @@ const TaskForm: React.FC<TaskFormProps> = ({ task, onSubmit, onCancel, loading =
     dueDate: task?.dueDate || '',
     status: task?.status || 'active'
   });
-  const [errors, setErrors] = React.useState<Partial<FormData>>({});
+
+  const [errors, setErrors] = useState<FormErrors>({});
+
 
   const validateField = (name: keyof FormData, value: string) => {
     switch (name) {
@@ -42,25 +47,26 @@ const TaskForm: React.FC<TaskFormProps> = ({ task, onSubmit, onCancel, loading =
           return 'Description must be less than 1000 characters';
         }
         return '';
-      default:
+        default:
         return '';
     }
   };
 
   const validateForm = () => {
-    const newErrors: Partial<FormData> = {};
-    Object.entries(formData).forEach(([key, value]) => {
-      if (typeof value === 'string') {
-        const error = validateField(key as keyof FormData, value);
-        if (error) {
-          newErrors[key as keyof FormData] = error;
-        }
-      }
-    });
+  const newErrors: FormErrors = {};
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+  Object.entries(formData).forEach(([key, value]) => {
+    if (typeof value === 'string') {
+      const error = validateField(key as keyof FormData, value);
+      if (error) {
+        newErrors[key as keyof FormData] = error;
+      }
+    }
+  });
+
+  setErrors(newErrors);
+  return Object.keys(newErrors).length === 0;
+};
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
