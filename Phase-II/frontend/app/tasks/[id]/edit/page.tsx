@@ -1,6 +1,6 @@
+// app/tasks/[id]/edit/page.tsx
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import EditTaskForm from './EditTaskForm'; // Client form component
-import { taskApi } from '@/lib/api';
 import { Task } from '@/lib/types';
 
 interface EditTaskPageProps {
@@ -11,9 +11,20 @@ const EditTaskPage = async ({ params }: EditTaskPageProps) => {
   const taskId = params.id;
 
   let task: Task | null = null;
+
   try {
-    const response = await taskApi.getTasks();
-    task = response.tasks.find((t: Task) => t.id === taskId) || null;
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/tasks`, {
+      method: 'GET',
+      cache: 'no-store', // always fresh data for SSR
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) throw new Error('Failed to fetch tasks');
+
+    const data = await response.json();
+    task = data.tasks.find((t: Task) => t.id === taskId) || null;
   } catch (err) {
     task = null;
   }
